@@ -104,9 +104,9 @@ def config_user_policy(num_phase):
             tab.set_title(i, tab_contents[i])
         
         section1 = widgets.Accordion(children=[w1])
-        section1.set_title(0, "Set Water Level threshold (ft)")
+        section1.set_title(0, "Set Water Level threshold (ft) (Use space to separate the values)")
         section2 = widgets.Accordion(children=[tab])
-        section2.set_title(0, "Set Export Amount (ac-ft)")
+        section2.set_title(0, "Set Export Amount (ac-ft) (Use space to separate the values)")
         accordion = widgets.VBox([section1, section2])
       
         return accordion
@@ -136,9 +136,9 @@ def config_user_policy(num_phase):
         
         # Replace the Text widget with a Dropdown widget
         w3 = widgets.Dropdown(
-            options=['year', 'level'],  # Dropdown options
+            options=['year', 'water level'],  # Dropdown options
             value='year',  # Default value
-            description='Type of dynamic:',
+            description='Type of dynamic (year or water level):',
             style={'description_width': 'initial'},
             disabled=False
         )
@@ -154,7 +154,7 @@ def config_user_policy(num_phase):
         ])
         
         for i in range(num_phase - 1):
-            w4.set_title(i, f'Start threshold of Phase {i + 2}:')
+            w4.set_title(i, f'Start threshold of Phase {i + 2}: (years since previous phase started, or water level at which to enact change)')
         
         tab_nest.children = phase_tabs + [w3, w4]
         tab_nest.set_title(num_phase, 'Dyn_Type')
@@ -493,14 +493,14 @@ def aggregate_consecutive_rows(df):
             if start == df.index[i-1]:
                 index_label = f"{start}"
             else:
-                index_label = f"{start}–{df.index[i-1]}"
+                index_label = f"{start}–{int(df.index[i-1])+1}"
             result.loc[index_label] = prev_row
             start = df.index[i]
         prev_row = current_row
     
     # Add the last group
     if start == df.index[-1]:
-        index_label = f"{start}"
+        index_label = f"≥{start}"
     else:
         index_label = f"{start}–{df.index[-1]}"
     result.loc[index_label] = prev_row
@@ -510,7 +510,7 @@ def aggregate_consecutive_rows(df):
 def return_for_multiple_phases(policy):
 
     aggregated_phase_dfs = {}
-
+    
     for phase in policy.phase:
 
         df = policy.sel(phase=phase)
@@ -527,7 +527,7 @@ def return_for_multiple_phases(policy):
 
         # Update the first and last index with <=Min and >=Max
         aggregated_df.index = aggregated_df.index.str.replace(f'{min_water_level}', f'≤{min_water_level}')
-        #aggregated_df.index = aggregated_df.index.str.replace(f'{max_water_level}–{max_water_level}', f'≥{max_water_level}')
+        #aggregated_df.index = aggregated_df.index.str.replace(f'{max_water_level}', f'≥{max_water_level}')
 
         # update name for rows/col
         aggregated_df.columns.name = 'Water Level / RYT'
@@ -1866,12 +1866,12 @@ def plot_variable_time_series_by_policy_mean(Wrapped_or_Projections, policies, p
 
             if Stdev:
                 # Plot the standard deviation as a shaded area using the current color
-                ax.fill_between(x_years, tmp_mean - tmp_std, tmp_mean + tmp_std, color=color, alpha=0.3)
+                ax.fill_between(x_years, tmp_mean - tmp_std, tmp_mean + tmp_std, color=color, alpha=0.2, label='Standard Deviation')
 
             if Min_Max:
                 # Plot the minimum and maximum as dashed lines using the current color
-                ax.plot(x_years, tmp_min, linestyle=':', color=color)
-                ax.plot(x_years, tmp_max, linestyle=':', color=color)
+                ax.plot(x_years, tmp_min, linestyle=':', color=color, label='Minimum')
+                ax.plot(x_years, tmp_max, linestyle='-.', color=color, label='Maximum')
 
     # Customize the plot
     if len(pt_policies_to_plot) == 1:
@@ -3444,12 +3444,13 @@ def create_user_PT_policy(Post_Transition_Policy_Data):
     
     ########## HARD-CODED TO 1 PHASE FOR POST-TRANSITION ######
     # Set the number of phases for the user-defined policy
-    num_phase = widgets.IntText(
-        value=1,  # Fixed to 1 phase
-        description='Number of phases:',
-        style={'description_width': 'initial'},
-        disabled=True  # Disable editing
-    )
+    #num_phase = widgets.IntText(
+    #    value=1,  # Fixed to 1 phase
+    #    description='Number of phases:',
+    #    style={'description_width': 'initial'},
+    #    disabled=True  # Disable editing
+    #)
+    num_phase = 1
 
     # Set the name for the user-defined policy
     pol_name = widgets.Text(
@@ -3532,7 +3533,8 @@ def create_user_PT_policy(Post_Transition_Policy_Data):
 
             # Retrieve the current values from the widgets
             policy_name = pol_name.value
-            number_of_phases = num_phase.value
+            #number_of_phases = num_phase.value
+            number_of_phases = num_phase
 
             # Validate the number of phases
             if not isinstance(number_of_phases, int) or number_of_phases < 1:
@@ -3633,7 +3635,7 @@ def create_user_PT_policy(Post_Transition_Policy_Data):
     add_button.on_click(on_add)
 
     # Display the widgets
-    display(widgets.VBox([num_phase, pol_name, define_button, update_button, add_button, output_display]))
+    display(widgets.VBox([pol_name, define_button, update_button, add_button, output_display]))
 
     
     
@@ -3818,7 +3820,7 @@ def define_model_conditions_interface(Policy_Data, Post_Transition_Policy_Data):
 
 # PLOT 2
 
-def create_checkbox_selector(options, title_text="Select Options", default_select_all=False):
+def create_checkbox_selector(options, title_text="Select Options", default_select_all=False, minimum=1):
     """
     Create a reusable checkbox-based selector with 'Select All' and 'Deselect All' buttons.
 
@@ -3873,7 +3875,10 @@ def create_checkbox_selector(options, title_text="Select Options", default_selec
     deselect_all_button.on_click(deselect_all)
 
     # Group widgets
-    title = widgets.HTML(f"<b style='font-size:16px;'>{title_text}</b>")
+    if minimum == 1:
+        title = widgets.HTML(f"<b style='font-size:16px;'>{title_text} (select one or multiple)</b>")
+    else:
+        title = widgets.HTML(f"<b style='font-size:16px;'>{title_text} (select at least {minimum})</b>")
     checkbox_group = widgets.VBox(
         checkboxes,
         layout=widgets.Layout(border='1px solid black', padding='5px', width='275px', align_items='flex-start')
@@ -3926,13 +3931,10 @@ def save_results_to_csv(path_to_save_to,name_of_file,Wrapped_or_Projections,Poli
             tmp = Policy_Outputs.sel(policy=pre_policy,PT_policy=post_policy)
 
             if Wrapped_or_Projections == 'Projections':
-
+                
                 for ssp in SSPs_of_Interest:
-
                     tmp_tmp = tmp.sel(ssp=ssp)
-
                     df = tmp_tmp.to_dataframe()
-
                     df_reset = df.reset_index()
 
                     # Step 2: Create a unique identifier for each GCM and SSP combination
@@ -3966,18 +3968,14 @@ def save_results_to_csv(path_to_save_to,name_of_file,Wrapped_or_Projections,Poli
                             df_pivot.to_excel(writer, sheet_name=f'{pre_policy}_{post_policy}_{ssp}', index=False)
 
             else:
-
+                
                 df = tmp.to_dataframe()
-
                 df_reset = df.reset_index()
-
-                column_name = 'Sequence'                
 
                 # Step 3: Pivot the DataFrame to align GCMs side-by-side, excluding 'Transition_Time'
                 df_pivot = df_reset.pivot_table(
-                    index=["year", "policy", "PT_policy"],  # Rows to keep
-                    columns=column_name,  # Columns to stack side-by-side (GCM_SSP as unique identifier)
-                    values=["Water_Level", "Storage", "Exports"],  # Values to display
+                    index=['policy', 'PT_policy', 'Sequence', 'year'],  # Rows to keep
+                    values=['Water_Level', 'Storage', 'Exports', 'Transition_Time'],  # Values to display
                     aggfunc='first'  # Ensure the first non-NaN value is kept in case of duplicates
                 )
 
@@ -3991,10 +3989,10 @@ def save_results_to_csv(path_to_save_to,name_of_file,Wrapped_or_Projections,Poli
                 file_path = os.path.join(path_to_save_to,f'{name_of_file}.xlsx')
                 if os.path.isfile(file_path):
                     with pd.ExcelWriter(file_path, mode='a') as writer:
-                        df_pivot.to_excel(writer, sheet_name=f'{pre_policy}_{post_policy}_{ssp}', index=False)
+                        df_pivot.to_excel(writer, sheet_name=f'{pre_policy}_{post_policy}', index=False)
                 else:
                     with pd.ExcelWriter(file_path, mode='w') as writer:
-                        df_pivot.to_excel(writer, sheet_name=f'{pre_policy}_{post_policy}_{ssp}', index=False)
+                        df_pivot.to_excel(writer, sheet_name=f'{pre_policy}_{post_policy}', index=False)
 
     print(f'Done saving results to {file_path}')
     
@@ -4013,6 +4011,9 @@ def write_data_to_excel(state,Policy_Outputs):
     if user_input == '1':
         name_of_file = input("Enter name of file that will be written (e.g. policy_outputs): ").strip()
         path_to_save_to = ''
+        file_path = os.path.join(path_to_save_to,f'{name_of_file}.xlsx')
+        if os.path.exists(file_path):
+            os.remove(file_path)
         save_results_to_csv(path_to_save_to,name_of_file,Wrapped_or_Projections,Policy_list,Post_Transition_Policy_List,SSPs_of_Interest,Policy_Outputs)
     else:
         pass
