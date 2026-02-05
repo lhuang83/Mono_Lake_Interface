@@ -10,7 +10,7 @@ This is a quick reference to understand the files used in the **UCLA Mono Lake M
 
 - **Mono_Lake_Interface_lib_v4.py**: This contains the bulk of python code functions used to represent the Mono Lake Water Budget (MLWB) and used to create figures in the user interface (this file is loaded into UCLA_MLM_User_Interface.ipynb) 
 
-- **data.tar**: This contains the climate projections across Mono Basin that are required as critical components for the Mono Lake Water Budget (e.g. precipitation on Mono Lake)
+- **data.tar**: This contains the climate projections across Mono Basin that are required as critical components for the Mono Lake Water Budget (e.g. precipitation on Mono Lake). It is unpacked in Step 0 of the notebook.
 
 - **Mono_Lake_Area_Storage_Elev.txt**: This contains the relationship between Mono Lake storage, water level, and surface area
 
