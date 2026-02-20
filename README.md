@@ -16,5 +16,18 @@ This is a quick reference to understand the files used in the **UCLA Mono Lake M
 
 - **details_for_model.csv**: This contains a few fine-tuned parameters that are used by the UCLA-MLM
 
-## Instructions for how to run the UCLA-MLM are provided in the User Interface (UCLA_MLM_User_Interface.ipynb)
-## Background information on Mono Lake and further details associated with the UCLA-MLM can be found in the accompanying report delivered to the SWRCB
+### Instructions for how to run the UCLA-MLM are provided in the User Interface (UCLA_MLM_User_Interface.ipynb)
+
+# Overview of Transition Export Criteria and Post-Transition Export Criteria
+
+![Alt text](images\Table%204-1%20Overview%20of%20Transition%20and%20Post-Transition%20Export%20Criteria.png)
+
+## Transition Export Criteria
+![Alt text](images/Transition%20Export%20Criteria%20A1%20to%20A8.png)
+![Alt text](images/Transition%20Export%20Criteria%20A9%20to%20A10.png)
+
+## Post-Transition Export Criteria
+
+![Alt text](images/Post-Transition%20Export%20Criteria.png)
+
+## More background information on Mono Lake and further details associated with the UCLA-MLM can be found in the accompanying report delivered to the SWRCB
