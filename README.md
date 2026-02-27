@@ -30,7 +30,7 @@ The UCLA-MLM focuses on the three SSPs available from CA5: SSP2-4.5, SSP3-7.0, a
 
 # Overview of Transition Export Criteria and Post-Transition Export Criteria
 
-![Alt text](images\Table%204-1%20Overview%20of%20Transition%20and%20Post-Transition%20Export%20Criteria.png)
+![Alt text](images/Table%204-1%20Overview%20of%20Transition%20and%20Post-Transition%20Export%20Criteria.png)
 
 ## Transition Export Criteria
 ![Alt text](images/Transition%20Export%20Criteria%20A1%20to%20A8.png)
