@@ -42,4 +42,4 @@ The UCLA-MLM focuses on the three SSPs available from CA5: SSP2-4.5, SSP3-7.0, a
 
 ![Alt text](images/image0.png)
 
-## More background information on Mono Lake and further details associated with the UCLA-MLM can be found in the accompanying report delivered to the SWRCB
+## More background information on Mono Lake and further details associated with the UCLA-MLM can be found in the accompanying report delivered to the SWRCB.
