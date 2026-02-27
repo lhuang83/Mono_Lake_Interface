@@ -1388,19 +1388,18 @@ def get_policy_output(state,
         run_time_each_policy = 0.1
     else:
         run_time_each_policy = 0.05
+
+    num_pre_transition_polices = len(Policy_list)
+    num_post_transition_policies = len(Post_Transition_Policy_List)
+
+    if Wrapped_or_Projections == 'Wrapped':
+        print('Simulation using Wrapped Run Method Based on Modeled Observations\n')
+    else:
+        print('Simulation using GCM Projections\n')
     
     ### assuming 3 seconds per policy for GCMs, 6 seconds for wrapped runs
     estimate_of_run_time = round(total_policy_combos_running * run_time_each_policy,1)  
-    print(f'For {total_policy_combos_running} Policy Combinations, Will Require Roughly {estimate_of_run_time} Minutes\n')
-    
-    if Wrapped_or_Projections == 'Wrapped':
-        print('Wrapped Runs')
-    else:
-        print('Projections')
-    
-    num_pre_transition_polices = len(Policy_list)
-    num_post_transition_policies = len(Post_Transition_Policy_List)
-    print(f'Running {num_pre_transition_polices} Pre-Transition Policies with {num_post_transition_policies} Post-Transition Policies')
+    print(f'Simulating UCLA-MLM with {num_pre_transition_polices} Transition Export Criteria and {num_post_transition_policies} Post-Transition Export Criteria, Will Require Roughly {estimate_of_run_time} Minutes')
     
     # Load observed data range of elev-vol-sa
     mono_lake_storage_elev = pd.read_csv(Lake_file,delimiter='\t')
@@ -1604,7 +1603,7 @@ def get_policy_output(state,
                 Predicted_Water_Levels_ssp = []
                 Predicted_Exports_ssp = []
                 
-                print(f'Policy: {Policy} + {post_transition_policy}')
+                print(f'Export Criteria: {Policy} + {post_transition_policy}')
 
                 for ssp in SSPs_of_Interest:
                     Predicted_Water_Levels_GCM = []
@@ -1727,7 +1726,7 @@ def plot_variable_time_series_by_model(Wrapped_or_Projections, Policy_of_Interes
             tmp_array.sel(GCM=clim)[Variable].plot.line(ax=ax, label=clim)
 
     # Customize the plot
-    ax.set_title(f"{variable_label} for Different {key_word}'s ({Start_Year}-{End_Year+1})\nPolicy: {Policy_of_Interest}, PT-Policy: {PT_Policy_of_Interest}")
+    ax.set_title(f"{variable_label} for Different {key_word}'s ({Start_Year}-{End_Year+1})\nExport Criteria: {Policy_of_Interest}, PT-Export Criteria: {PT_Policy_of_Interest}")
     ax.set_xlabel('Year')
     ax.set_ylabel(f'{variable_label} ({tmp_unit})')
 
@@ -1796,7 +1795,7 @@ def plot_variable_time_series_by_policy(Wrapped_or_Projections, policies, pt_pol
             ax.set_xlabel('Year')
             ax.set_ylabel(f'{variable_label} ({tmp_unit})')
 
-            ax.legend(title='Policy', bbox_to_anchor=(1.05, 1), loc='upper left',title_fontsize=16)
+            ax.legend(title='', bbox_to_anchor=(1.05, 1), loc='upper left',title_fontsize=16)
 
             if Variable == 'Water_Level':
                 ax.axhline(6392,color='black',linestyle='--')
@@ -1888,7 +1887,7 @@ def plot_variable_time_series_by_policy_mean(Wrapped_or_Projections, policies, p
     ax.set_ylabel(f'{variable_label} ({tmp_unit})')
 
     # Add legend and grid
-    ax.legend(title='Policy', bbox_to_anchor=(1.05, 1), loc='upper left', title_fontsize=16)
+    ax.legend(title='Export Criteria', bbox_to_anchor=(1.05, 1), loc='upper left', title_fontsize=16)
 
     if Variable == 'Water_Level':
         ax.axhline(6392,color='black',linestyle='--')
@@ -1959,12 +1958,12 @@ def boxplot_variable_by_policy(Wrapped_or_Projections, policies, pt_policies_to_
     # Customize the plot
     if len(pt_policies_to_plot) == 1:
         if tmp_policy == 'None':
-            ax.set_title(f"{variable_label} for Different Policies\nFor Year: {year_of_interest}\nPT Policy: Same as Pre-Transition")
+            ax.set_title(f"{variable_label} for Different Export Criteria\nFor Year: {year_of_interest}\nPT Export Criteria: Same as Transition")
         else:
-            ax.set_title(f"{variable_label} for Different Policies\nFor Year: {year_of_interest}\nPT Policy: {tmp_pt_policy}")
+            ax.set_title(f"{variable_label} for Different Export Criteria\nFor Year: {year_of_interest}\nPT Export Criteria: {tmp_pt_policy}")
     else:
-        ax.set_title(f"{variable_label} for Different Policies\nFor Year: {year_of_interest}")
-    ax.set_xlabel('Policy Combinations')
+        ax.set_title(f"{variable_label} for Different Export Criteria\nFor Year: {year_of_interest}")
+    ax.set_xlabel('Export Criteria Combinations')
     ax.set_ylabel(f'{variable_label} ({tmp_unit})')
     ax.set_xticks(boxplot_positions)
     ax.set_xticklabels(boxplot_labels, rotation=45, ha='right')
@@ -2097,7 +2096,7 @@ def boxplot_variables_by_policies(Wrapped_or_Projections, policies_to_plot, pt_p
             ax.set_ylabel(f'{variable_label} ({tmp_unit})', fontsize=16)
             ax.set_xticks(boxplot_positions)
             ax.set_xticklabels(boxplot_labels, rotation=45, ha='right')
-            ax.set_title(f"PT Policy: {tmp_pt_policy}")
+            ax.set_title(f"PT Export Criteria: {tmp_pt_policy}")
 
             # Set consistent y-axis limits for the variable
             ax.set_ylim(y_limits[Variable])
@@ -2125,7 +2124,7 @@ def boxplot_variables_by_policies(Wrapped_or_Projections, policies_to_plot, pt_p
     fig.legend(handles=[median_line, mean_marker, box_edge, whisker_line], bbox_to_anchor=(1.0, 0.97), loc='upper left', fontsize=14)
 
     # Add an overall title for the figure
-    fig.suptitle(f'Policy Performance Evaluation for Year: {year_of_interest}', fontsize=24, y=1.04)
+    fig.suptitle(f'Export Criteria Performance Evaluation for Year: {year_of_interest}', fontsize=24, y=1.04)
     
 def plot_variables_by_policies(Wrapped_or_Projections, policies_to_plot, pt_policies_to_plot, variables_to_plot, year_of_interest, 
                                SSP_of_Interest, Policy_Outputs, key_word, Start_Year, End_Year, use_std=True, use_median=False, include_global_limit=False):
@@ -2302,7 +2301,7 @@ def plot_variables_by_policies(Wrapped_or_Projections, policies_to_plot, pt_poli
     fig.legend(handles, labels, loc='upper right', bbox_to_anchor=(0.96, 0.90), fontsize=14)
 
     # Add an overall title for the figure
-    fig.suptitle(f'Policy Performance Evaluation for Year: {year_of_interest}', fontsize=24, y=1.04)
+    fig.suptitle(f'Export Criteria Performance Evaluation for Year: {year_of_interest}', fontsize=24, y=1.04)
     
 def plot_gcm_percent_above_level_by_policy(Wrapped_or_Projections, policies_to_plot, pt_policies_to_plot, Variable, Water_Level_of_Interest, 
                                SSP_of_Interest, Policy_Outputs,key_word, Start_Year, End_Year):
@@ -2395,7 +2394,7 @@ def plot_gcm_percent_above_level_by_policy(Wrapped_or_Projections, policies_to_p
             ax.text(tick, -0.2, f"{year_since}", transform=ax.get_xaxis_transform(), ha='center', va='top', fontsize=14, color='gray')
 
         # Set title for each subplot
-        ax.set_title(f"Post-Transition Policy: {tmp_pt_policy}")
+        ax.set_title(f"Post-Transition Export Criteria: {tmp_pt_policy}")
 
         # Add a legend to each subplot
         if col_idx == 0:
@@ -2875,7 +2874,7 @@ def percent_diff_gcm_above_level_by_ssp_policy(Wrapped_or_Projections, policies_
         # Customize the subplot
         ax.set_xticks(positions + bar_width * (num_decades - 1) / 2)  # Center the tick labels
         ax.set_xticklabels(ssps_to_plot)
-        ax.set_title(f'Policy {tmp_policy}', fontsize=16, fontweight='bold')
+        ax.set_title(f'Export Criteria {tmp_policy}', fontsize=16, fontweight='bold')
         if tmp_policy != 'A1':
             ax.grid(axis='y')
 
@@ -2885,8 +2884,8 @@ def percent_diff_gcm_above_level_by_ssp_policy(Wrapped_or_Projections, policies_
 
     # Set common titles and labels
     fig.suptitle(f"Percent Difference in GCMs reaching Water Level {Water_Level_of_Interest} ft (relative to Existing Policy)\nPost-Transition: {pt_policy}", fontsize=22, y=1.0)
-    fig.text(-0.02, 0.5, 'Percent Difference (%) from Existing Policy (A1)', va='center', rotation='vertical', fontsize=22)
-    fig.text(1.005, 0.5, 'Difference in Exports (ac-ft) from Existing Policy (A1)', va='center', rotation=270, fontsize=22)
+    fig.text(-0.02, 0.5, 'Percent Difference (%) from Existing Export Criteria (A1)', va='center', rotation='vertical', fontsize=22)
+    fig.text(1.005, 0.5, 'Difference in Exports (ac-ft) from Existing Export Criteria (A1)', va='center', rotation=270, fontsize=22)
 
     # Adjust layout
     plt.tight_layout()
@@ -3149,7 +3148,7 @@ def generate_table_of_metrics(Wrapped_or_Projections, SSP_of_Interest, pt_polici
 
             Policy_Summary_Table[f"Avg_Exports (ac-ft)"][f'{policy_tmp}, PT: {pt_policy_tmp}']=exp_mean_np
             Policy_Summary_Table[f"Cum_Exports (1000s ac-ft)"][f'{policy_tmp}, PT: {pt_policy_tmp}']=exp_sum_np
-            Policy_Summary_Table.to_csv('Policy_Summary_Table.csv', index=False)
+            Policy_Summary_Table.to_csv('Export_Criteria_Summary_Table.csv', index=False)
             
             return Policy_Summary_Table
 
@@ -3248,7 +3247,7 @@ def create_user_policy(Policy_Data):
     # Set the number of phases for the user-defined policy
     num_phase = widgets.IntText(
         value=1,
-        description='Number of phases:',
+        description='Number of Phases:',
         style={'description_width': 'initial'},
         disabled=False
     )
@@ -3256,18 +3255,19 @@ def create_user_policy(Policy_Data):
     # Set the name for the user-defined policy
     pol_name = widgets.Text(
         value='',
-        description='Name of policy:',
+        description='Name of Export Criteria:',
         style={'description_width': 'initial'},
         disabled=False
     )
 
     # Buttons for actions
-    define_button = widgets.Button(description="1) Define Policy")  # Updated button label
-    update_button = widgets.Button(description="2) Review Policy")
-    add_button = widgets.Button(description="3) Add Policy")  # New "Add" button
-    define_button.layout.display = '230px'
-    update_button.layout.display = '230px'  # Initially hidden
-    add_button.layout.display = '230px'  # Initially hidden
+    style = {'description_width': 'initial'}
+    define_button = widgets.Button(description='1) Define Export Criteria', layout=widgets.Layout(width='300px'))  # Updated button label
+    update_button = widgets.Button(description='2) Review Export Criteria', layout=widgets.Layout(width='300px'))
+    add_button = widgets.Button(description='3) Add Export Criteria', layout=widgets.Layout(width='300px'))  # New "Add" button
+    #define_button.layout.display = '230px'
+    #update_button.layout.display = '230px'  # Initially hidden
+    #add_button.layout.display = '230px'  # Initially hidden
 
     # Output widget to display results
     output_display = widgets.Output()
@@ -3344,17 +3344,17 @@ def create_user_policy(Policy_Data):
 
             # Validate the policy name
             if not policy_name.strip():
-                print("Error: Policy name cannot be empty.")
-                display("Error: Policy name cannot be empty. Please provide a valid policy name.")
+                print("Error: Export criteria name cannot be empty.")
+                display("Error: Export criteria name cannot be empty. Please provide a valid export criteria name.")
                 return
 
             # Check if the policy name already exists in Policy_Data
             if policy_name in Policy_Data:
-                display(f"NOTE: YOU WILL OVERRIDE THE EXISTING '{policy_name}' POLICY PREVIOUSLY CREATED IF CLICK ADD.")
+                display(f"NOTE: YOU WILL OVERRIDE THE EXISTING '{policy_name}' EXPORT CRITERIA PREVIOUSLY CREATED IF CLICK ADD.")
 
             # Check if the number of phases has changed
             if current_policy_data["number_of_phase"] is not None and number_of_phases != current_policy_data["number_of_phase"]:
-                display("Number of phases has changed. Resetting the policy configuration.")
+                display("Number of phases has changed. Resetting the export criteria configuration.")
                 current_policy_data["out3"] = None  # Clear the current configuration state
 
             # Update the policy data
@@ -3424,9 +3424,9 @@ def create_user_policy(Policy_Data):
             if policy_name and data_array is not None:
                 # Add the data array to Policy_Data
                 Policy_Data[policy_name] = data_array
-                display(f"Policy '{policy_name}' added to Pre-Transition Policies")
+                display(f"Export criteria '{policy_name}' added to Transition export criteria")
             else:
-                display("Error: Policy name or data array is missing.")
+                display("Error: Export criteria name or data array is missing.")
 
     # Attach button click handlers
     define_button.on_click(on_define)
@@ -3455,18 +3455,18 @@ def create_user_PT_policy(Post_Transition_Policy_Data):
     # Set the name for the user-defined policy
     pol_name = widgets.Text(
         value='',
-        description='Name of policy:',
+        description='Name of Export Criteria:',
         style={'description_width': 'initial'},
         disabled=False
     )
 
     # Buttons for actions
-    define_button = widgets.Button(description="1) Define Policy")  # Updated button label
-    update_button = widgets.Button(description="2) Review Policy")
-    add_button = widgets.Button(description="3) Add Policy")  # New "Add" button
-    define_button.layout.display = '230px'
-    update_button.layout.display = '230px'  # Initially hidden
-    add_button.layout.display = '230px'  # Initially hidden
+    define_button = widgets.Button(description='1) Define Export Criteria', layout=widgets.Layout(width='300px'))  # Updated button label
+    update_button = widgets.Button(description='2) Review Export Criteria', layout=widgets.Layout(width='300px'))
+    add_button = widgets.Button(description='3) Add Export Criteria', layout=widgets.Layout(width='300px'))  # New "Add" button
+    #define_button.layout.display = '230px'
+    #update_button.layout.display = '230px'  # Initially hidden
+    #add_button.layout.display = '230px'  # Initially hidden
 
     # Output widget to display results
     output_display = widgets.Output()
@@ -3520,7 +3520,7 @@ def create_user_PT_policy(Post_Transition_Policy_Data):
                 phase_threshs = [phase_thresh_widget.children[j].value for j in range(len(phase_thresh_widget.children))]
 
         except Exception as e:
-            display(f"Error processing policy: {e}")
+            display(f"Error processing export criteria: {e}")
             return None
 
         # Create data array using the parsed user input
@@ -3544,17 +3544,17 @@ def create_user_PT_policy(Post_Transition_Policy_Data):
 
             # Validate the policy name
             if not policy_name.strip():
-                print("Error: Policy name cannot be empty.")
-                display("Error: Policy name cannot be empty. Please provide a valid policy name.")
+                print("Error: Export criteria name cannot be empty.")
+                display("Error: Export criteria name cannot be empty. Please provide a valid export criteria name.")
                 return
 
             # Check if the policy name already exists in Policy_Data
             if policy_name in Post_Transition_Policy_Data:
-                display(f"NOTE: YOU WILL OVERRIDE THE EXISTING '{policy_name}' POLICY PREVIOUSLY CREATED IF CLICK ADD.")
+                display(f"NOTE: YOU WILL OVERRIDE THE EXISTING '{policy_name}' EXPORT CRITERIA PREVIOUSLY CREATED IF CLICK ADD.")
 
             # Check if the number of phases has changed
             if current_policy_data["number_of_phase"] is not None and number_of_phases != current_policy_data["number_of_phase"]:
-                display("Number of phases has changed. Resetting the policy configuration.")
+                display("Number of phases has changed. Resetting the export criteria configuration.")
                 current_policy_data["out3"] = None  # Clear the current configuration state
 
             # Update the policy data
@@ -3625,9 +3625,9 @@ def create_user_PT_policy(Post_Transition_Policy_Data):
             if policy_name and data_array is not None:
                 # Add the data array to Policy_Data
                 Post_Transition_Policy_Data[policy_name] = data_array
-                display(f"Policy '{policy_name}' added to Post-Transition Policies")
+                display(f"Export criteria '{policy_name}' added to Post-Transition export criteria")
             else:
-                display("Error: Policy name or data array is missing.")
+                display("Error: Export criteria name or data array is missing.")
 
     # Attach button click handlers
     define_button.on_click(on_define)
@@ -3788,12 +3788,12 @@ def define_model_conditions_interface(Policy_Data, Post_Transition_Policy_Data):
     # Policy Selectors
     def display_policy_selectors():
         pre_transition_policies = list(Policy_Data.keys())
-        pre_transition_selector, Policy_list = create_policy_selector(pre_transition_policies, "Pre-Transition Policies")
+        pre_transition_selector, Policy_list = create_policy_selector(pre_transition_policies, "Transition Export Criteria")
         state["Pre_Transition_Policies"] = Policy_list
         display(pre_transition_selector)
 
         post_transition_policies = list(Post_Transition_Policy_Data.keys())
-        post_transition_selector, Post_Transition_Policy_List = create_policy_selector(post_transition_policies, "Post-Transition Policies")
+        post_transition_selector, Post_Transition_Policy_List = create_policy_selector(post_transition_policies, "Post-Transition Export Criteria")
         state["Post_Transition_Policies"] = Post_Transition_Policy_List
         display(post_transition_selector)
 
@@ -3943,9 +3943,9 @@ def save_results_to_csv(path_to_save_to,name_of_file,Wrapped_or_Projections,Poli
 
                     # Step 3: Pivot the DataFrame to align GCMs side-by-side, excluding 'Transition_Time'
                     df_pivot = df_reset.pivot_table(
-                        index=["year", "policy", "PT_policy"],  # Rows to keep
+                        index=['year', 'policy', 'PT_policy'],  # Rows to keep
                         columns=column_name,  # Columns to stack side-by-side (GCM_SSP as unique identifier)
-                        values=["Water_Level", "Storage", "Exports"],  # Values to display
+                        values=['Water_Level', 'Storage', 'Exports'],  # Values to display
                         aggfunc='first'  # Ensure the first non-NaN value is kept in case of duplicates
                     )
 
@@ -3954,7 +3954,8 @@ def save_results_to_csv(path_to_save_to,name_of_file,Wrapped_or_Projections,Poli
 
                     # Step 5: Reset index if desired
                     df_pivot.reset_index(inplace=True)
-
+                    df_pivot = df_pivot.rename(columns={'policy': 'Transition_Export_Criteria', 'PT_policy': 'Post_Transition_Export_Criteria'})
+                    
                     # Save to a CSV file
                     #df_pivot.to_csv(f'{path_to_save_to}/{pre_policy}_{post_policy}_{ssp}.csv')
                     
@@ -3981,6 +3982,7 @@ def save_results_to_csv(path_to_save_to,name_of_file,Wrapped_or_Projections,Poli
 
                 # Step 5: Reset index if desired
                 df_pivot.reset_index(inplace=True)
+                df_pivot = df_pivot.rename(columns={'policy': 'Transition_Export_Criteria', 'PT_policy': 'Post_Transition_Export_Criteria'})
 
                 # Save to a CSV file
                 #df_pivot.to_csv(f'{path_to_save_to}/{pre_policy}_{post_policy}.csv')
@@ -4007,9 +4009,9 @@ def write_data_to_excel(state,Policy_Outputs):
     Policy_list = state["Pre_Transition_Policies"]
     Post_Transition_Policy_List = state["Post_Transition_Policies"]
     SSPs_of_Interest = state["SSPs_of_Interest"]
-    user_input = input("Enter 1 to write results to excel file OR anything else not to write output")
+    user_input = input("Type 1 and then Press 'Return' or 'Enter' on Keyboard to write results to excel file OR anything else not to write output")
     if user_input == '1':
-        name_of_file = input("Enter name of file that will be written (e.g. policy_outputs): ").strip()
+        name_of_file = input("Type name of file (e.g. export_criteria_outputs) and then Press 'Return' or 'Enter' on Keyboard: ").strip()
         path_to_save_to = ''
         file_path = os.path.join(path_to_save_to,f'{name_of_file}.xlsx')
         if os.path.exists(file_path):
@@ -4223,8 +4225,9 @@ def create_widgets(state, Policy_Outputs):
     Policy_of_Interest = widgets.Select(
         options = Policy_list,
         value = Policy_list[0],
-        description = 'Policy of Interest:',
+        description = 'Export Criteria of Interest:',
         style = {'description_width': 'initial'},
+        layout=widgets.Layout(width='250px'),
         rows = len(list(Policy_Outputs.policy.values)),
         continuous_update = True,
         disabled = False
@@ -4233,8 +4236,9 @@ def create_widgets(state, Policy_Outputs):
     PT_Policy_of_Interest = widgets.Select(
         options = Post_Transition_Policy_List,
         value = Post_Transition_Policy_List[0],
-        description = 'Post Transition Policy of Interest:',
+        description = 'Post Transition Export Criteria of Interest:',
         style = {'description_width': 'initial'},
+        layout=widgets.Layout(width='350px'),
         rows = len(list(Policy_Outputs.PT_policy.values)),
         continuous_update = True,
         disabled = False
@@ -4245,6 +4249,7 @@ def create_widgets(state, Policy_Outputs):
         value = 'Water_Level',
         description = 'Variable of Interest:',
         style = {'description_width': 'initial'},
+        layout=widgets.Layout(width='300px'),
         rows = 3,
         continuous_update = True,
         disabled = False
@@ -4256,6 +4261,7 @@ def create_widgets(state, Policy_Outputs):
         value = 'ssp370',
         description = 'SSP of Interest:',
         style = {'description_width': 'initial'},
+        layout=widgets.Layout(width='250px'),
         rows = 3,
         continuous_update = True,
         disabled = False
@@ -4332,12 +4338,12 @@ def wrapper_boxplot_variable_by_policy(
 
     # Check if any pre-transition policies are selected
     if not selected_policies:
-        print("Error: No pre-transition policies selected.")
+        print("Error: No transition export criteria selected.")
         return
 
     # Check if at least two post-transition policies are selected
     if len(selected_pt_policies) < 2:
-        print("Error: Please select at least two post-transition policies.")
+        print("Error: Please select at least two post-transition export criteria.")
         return
 
     # Call the main boxplot function
@@ -4378,10 +4384,10 @@ def wrapper_plot_variable_time_series_by_policy_mean(
 
     # Check if any policies are selected
     if not selected_policies:
-        print("Error: No pre-transition policies selected.")
+        print("Error: No transition export criteria selected.")
         return
     if not selected_pt_policies:
-        print("Error: No post-transition policies selected.")
+        print("Error: No post-transition export criteria selected.")
         return
 
     # Call the main plotting function
@@ -4430,7 +4436,7 @@ def wrapper_boxplot_variables_by_policies(
 
     # Check if at least two post-transition policies are selected
     if len(selected_pt_policies) < 2:
-        print("Error: Please select at least two post-transition policies to compare.")
+        print("Error: Please select at least two post-transition export criteria to compare.")
         return
 
     # Call the main boxplot function
@@ -4509,12 +4515,12 @@ def wrapper_plot_gcm_percent_above_level_by_policy(
 
     # Check if at least one pre-transition policy is selected
     if not selected_policies:
-        print("Error: Please select at least one pre-transition policy.")
+        print("Error: Please select at least one transition export criteria.")
         return
 
     # Check if at least one post-transition policy is selected
     if not selected_pt_policies:
-        print("Error: Please select at least one post-transition policy.")
+        print("Error: Please select at least one post-transition export criteria.")
         return
 
     # Call the main plotting function
@@ -4555,7 +4561,7 @@ def wrapper_plot_plot_percent_in_transition_phase(
 
     # Check if at least one pre-transition policy is selected
     if not selected_policies:
-        print("Error: Please select at least one pre-transition policy.")
+        print("Error: Please select at least one transition export criteria.")
         return
 
     # Call the main plotting function
@@ -4597,7 +4603,7 @@ def wrapper_plot_gcm_percent_above_level_by_ssp(
 
     # Check if at least one pre-transition policy is selected
     if not selected_policies:
-        print("Error: Please select at least one pre-transition policy.")
+        print("Error: Please select at least one transition export criteria.")
         return
 
     # Call the main plotting function
@@ -4638,11 +4644,11 @@ def wrapper_function(
     
     # Dynamically retrieve selected pre-transition policies
     policies_to_plot = get_selected_policies()  # Use the dynamically updated function
-    print(f"Selected Pre-Transition Policies: {policies_to_plot}")  # Debug print
+    print(f"Selected Transition Export Criteria: {policies_to_plot}")  # Debug print
 
     # Check if any pre-transition policies are selected
     if not policies_to_plot:
-        print("Error: Please select at least one pre-transition policy.")
+        print("Error: Please select at least one transition export criteria.")
         return
 
     # Call the main function with the dynamically selected policies
@@ -4899,9 +4905,9 @@ def plot_percent_diff_pre_post_trans_with_export(
     ax.text(-1.0,0,f'Percent GCMs Above {Water_Level_of_Interest} ft',rotation=90,fontsize=16,color='black')
 
     if Compare_to_A1_or_A2 == 'A2':
-        ax.set_title('No Exports in\nPre- or Post-Transition',fontweight='bold',fontsize=18)
+        ax.set_title('No Exports in\nTransition or Post-Transition',fontweight='bold',fontsize=18)
     elif Compare_to_A1_or_A2 == 'A1':
-        ax.set_title('Existing Policy (A1)\nWith D-1631 Post-Transition',fontsize=18)
+        ax.set_title('Existing Export Criteria (A1)\nWith D-1631 Post-Transition',fontsize=18)
 
     if Compare_to_A1_or_A2 == 'A2':
         pass
@@ -5047,9 +5053,9 @@ def plot_percent_diff_pre_post_trans_with_export(
 
     # Set common titles and labels
     if Compare_to_A1_or_A2 == 'A2':
-        fig.suptitle(f"Difference Relative to No Exports in Pre- and Post-Transition (A2+None)\nTop Left Plot = A2+None; All other plots = difference from A2+None", fontsize=25,fontweight='bold',y=1.005)
+        fig.suptitle(f"Difference Relative to No Exports in Transition and Post-Transition Export Criteria(A2+None)\nTop Left Plot = A2+None; All other plots = difference from A2+None", fontsize=25,fontweight='bold',y=1.005)
     elif Compare_to_A1_or_A2 == 'A1':
-        fig.suptitle(f"Difference Relative to Existing Pre- and Post-Transition Policy (A1+D_1631)\nTop Left Plot = A1+D_1631; All other plots = difference from A1+D_1631",fontsize=25,fontweight='bold',y=1.005)
+        fig.suptitle(f"Difference Relative to Existing Transition and Post-Transition Export Criteria (A1+D_1631)\nTop Left Plot = A1+D_1631; All other plots = difference from A1+D_1631",fontsize=25,fontweight='bold',y=1.005)
 
     if Compare_to_A1_or_A2 == 'A2':
         fig.text(-0.02, 0.5, f'Percent Difference in GCMs Above {Water_Level_of_Interest} ft', va='center', rotation='vertical', fontsize=24,fontweight='bold')
@@ -5140,7 +5146,7 @@ def plot_percent_diff_pre_post_trans_without_export(
     ax.set_ylabel(f'Percent GCMs Above {Water_Level_of_Interest} ft', fontsize=18)
     ax.set_xticks(positions + bar_width * (num_decades - 1) / 2)
     ax.set_xticklabels(ssps_to_plot, fontsize=16)
-    ax.set_title('No Exports\nPre- and Post-Transition', fontsize=20, fontweight='bold')
+    ax.set_title('No Exports\nTransition and Post-Transition', fontsize=20, fontweight='bold')
     ax.grid(axis='y')
 
     # Second pass for other policies
@@ -5191,7 +5197,7 @@ def plot_percent_diff_pre_post_trans_without_export(
     # Common title and labels
     fig.suptitle(f"Percent Difference in GCMs Above {Water_Level_of_Interest} ft\nUsing Post-Transition: {pt_policy}", fontsize=24, fontweight='bold', y=1.02)
     #fig.text(0.5, -0.02, 'SSPs', va='center', ha='center', fontsize=18, fontweight='bold')
-    fig.text(-0.03, 0.5, f'Percent Difference from No Exports in Pre/Post-Transition (%)', va='center', rotation='vertical', fontsize=24, fontweight='bold')
+    fig.text(-0.03, 0.5, f'Percent Difference from No Exports in Transition/Post-Transition (%)', va='center', rotation='vertical', fontsize=24, fontweight='bold')
 
     # Adjust layout
     plt.tight_layout()
@@ -5350,7 +5356,7 @@ def line_plot_policy_performance(
             ax.grid(axis='x', linestyle='-', alpha=1.0)
 
             if col == 0:
-                ax.set_ylabel(f"PT Policy\n{pt_policy}", fontsize=24, fontweight='bold',labelpad=40, va='center')
+                ax.set_ylabel(f"PT Export Criteria\n{pt_policy}", fontsize=24, fontweight='bold',labelpad=40, va='center')
             if row == 0:
                 ax.set_title(f"{ssp}", fontsize=24,fontweight='bold')
 
@@ -5381,7 +5387,7 @@ def line_plot_policy_performance(
     end_yr_for_analysis = Start_Year + end_year_index
     fig.text(-0.06,0.35,'Percent Difference in GCMs Above\nWater Level Compared to No Exports (A2+None) (%)',fontsize=28,rotation=90,fontweight='bold',va='center',ha='center')
     fig.text(1.04,0.1,'Average Exports/Year (ac-ft)',fontsize=28,rotation=270,fontweight='bold')
-    fig.suptitle(f"Performance of Policies for Selected Metrics Relative to No Exports in Pre- and Post-Transition\nEvaluated for {start_yr_for_analysis}-{end_yr_for_analysis} ({start_year_index}-{end_year_index} Years From Now)", y=0.91,fontsize=28,fontweight='bold')
+    fig.suptitle(f"Performance of Policies for Selected Metrics Relative to No Exports in Transition and Post-Transition\nEvaluated for {start_yr_for_analysis}-{end_yr_for_analysis} ({start_year_index}-{end_year_index} Years From Now)", y=0.91,fontsize=28,fontweight='bold')
     plt.tight_layout(rect=[0, 0, 1, 0.95])
 
 ### Performance for Selected Policies in a table format
@@ -5410,10 +5416,6 @@ def table_plot_policy_performance(
 
     ### does transition occur?
     transition_time_threshold = end_year_index
-
-    # Initialize lists to store extracted metrics data
-    percent_data_records = []
-    export_data_records = []
     
     policies_to_plot = get_policies_to_plot()
     pt_policies = get_pt_policies()
@@ -5475,8 +5477,8 @@ def table_plot_policy_performance(
                     continue
 
     # Convert to DataFrames
-    percent_data_df = pd.DataFrame(percent_data_records, columns=['Policy Combination'] + percent_metrics).set_index('Policy Combination')
-    export_data_df = pd.DataFrame(export_data_records, columns=['Policy Combination'] + export_metrics).set_index('Policy Combination')
+    percent_data_df = pd.DataFrame(percent_data_records, columns=['Export Criteria Combination'] + percent_metrics).set_index('Export Criteria Combination')
+    export_data_df = pd.DataFrame(export_data_records, columns=['Export Criteria Combination'] + export_metrics).set_index('Export Criteria Combination')
 
     # Sort by "% Above 6391"
     sorted_percent_data_df = percent_data_df.sort_values(by="% Above 6391", ascending=False)
@@ -5540,7 +5542,7 @@ def table_plot_policy_performance(
     ax1.set_title(f"Percent Metrics (based on {start_year_index} to {end_year_index} Years)", fontsize=18, fontweight='bold')
     ax2.set_title(f"Export Metrics (based on {start_year_index} to {end_year_index} Years)", fontsize=18, fontweight='bold')
 
-    ax1.set_ylabel("Policy Combinations (Pre-Post Transition)", fontsize=22, fontweight='bold')
+    ax1.set_ylabel("Export Criteria Combinations", fontsize=22, fontweight='bold')
     ax2.set_ylabel("")
 
     ax1.set_xticks(np.arange(len(percent_metrics)) + 0.5)
@@ -5553,7 +5555,7 @@ def table_plot_policy_performance(
     start_yr_for_analysis = Start_Year + start_year_index
     end_yr_for_analysis = Start_Year + end_year_index
     fig.suptitle(
-        f"Performance of Policies for {ssps_to_plot[0]}\nEvaluated for {start_yr_for_analysis}-{end_yr_for_analysis} ({start_year_index}-{end_year_index} Years From Now)", 
+        f"Performance of Export Criteria for {ssps_to_plot[0]}\nEvaluated for {start_yr_for_analysis}-{end_yr_for_analysis} ({start_year_index}-{end_year_index} Years From Now)", 
         y=1.0, fontsize=28, fontweight='bold'
     )
 
