@@ -32,14 +32,14 @@ The UCLA-MLM focuses on the three SSPs available from CA5: SSP2-4.5, SSP3-7.0, a
 
 ## Pre-Loaded Transition Export Criteria
 
-![Alt text][images/image1.png]
+![Alt text](images/image1.png)
 
 ## Pre-Loaded Post-Transition Export Criteria
 
-![Alt text][images/image2.png]
+![Alt text](images/image2.png)
 
 ## Existing Transition Export Criteria and Post-Transition Export Criteria
 
-![Alt text][images/image0.png]
+![Alt text](images/image0.png)
 
 ## More background information on Mono Lake and further details associated with the UCLA-MLM can be found in the accompanying report delivered to the SWRCB
